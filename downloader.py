@@ -6,7 +6,7 @@ Ice.loadSlice('trawlnet.ice')
 import sys
 import TrawlNet
 
-
+import download_mp3 as d
 
 class Server(Ice.Application):
     def run(self, argv):
@@ -15,7 +15,7 @@ class Server(Ice.Application):
         adapter = broker.createObjectAdapter("DownloaderAdapter")
         proxy_server = adapter.add(servidor, broker.stringToIdentity("dw"))
 
-        print('',proxy_server)
+        print(proxy_server,flush=True)
         adapter.activate()
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
@@ -28,10 +28,10 @@ class Downloader(TrawlNet.Downloader):
 
     def addDownloadTask(self, url, current=None):
         self.url=url
-        print("Recibo",url)
-        print("Descargando", url)
-        var = "downloader ha finalizado"
-        return var
+        print("Recibo",self.url)
+        print("Descargando", self.url)
+
+        return d.download_mp3(self.url)
 
 
 server = Server()
