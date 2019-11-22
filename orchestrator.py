@@ -1,38 +1,42 @@
-#!/usr/bin/python3
-# -*- coding: utf-8; mode: python; -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-import Ice
-Ice.loadSlice('trawlnet.ice')
+'''
+Implementacion Orchestrator
+'''
+
 import sys
-import TrawlNet
+import Ice # pylint: disable=E0401, C0413
+Ice.loadSlice('trawlnet.ice')
+import TrawlNet # pylint: disable=E0401, C0413
 
 class Orchestrator(TrawlNet.Orchestrator):
-    def __init__(self, dw):
-        self.dw = dw
+    ''' Clase orchestrador '''
+
+    def __init__(self, downloader):
+        ''' constructor '''
+        self.dw = downloader
 
     def downloadTask(self, url, current=None):
-        print("Se recibe la URL: ",url)
+        ''' Tarea de descargar '''
+        print("Se recibe ", url)
         print("Se envia a downloader")
         msg = self.dw.addDownloadTask(url)
-        print(msg)
-
         return msg
 
 
 class Server(Ice.Application):
+    ''' Servidor '''
     def run(self, argv):
-        print('Iniciando servidor Orchestrato')
+        ''' Run servidor en Ice '''
+
         broker = self.communicator()
         prx_dw = broker.stringToProxy(argv[1])
         downloader = TrawlNet.DownloaderPrx.checkedCast(prx_dw)
         if not downloader:
-
             raise RuntimeError('Error')
 
-        # Creamos el orchestrator
         server = Orchestrator(downloader)
-
-        #Añadimos adapatdor
         adapter = broker.createObjectAdapter("OrchestratorAdapter")
         prx_orches = adapter.add(server, broker.stringToIdentity("orc"))
 
