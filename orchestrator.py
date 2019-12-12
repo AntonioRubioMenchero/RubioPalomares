@@ -36,8 +36,8 @@ class Server(Ice.Application):  #pylint: disable=R0903
         broker = self.communicator()
         proxy = broker.stringToProxy(argv[1])
         downloader_instance = TrawlNet.DownloaderPrx.checkedCast(proxy)
-        #if not downloader_instance:
-            #raise RuntimeError('Invalid proxy instance')
+        if not downloader_instance:
+            raise RuntimeError('Invalid proxy instance')
 
         evento_ficheros = UpdateEventI()
         files = evento_ficheros.files
@@ -51,12 +51,29 @@ class Server(Ice.Application):  #pylint: disable=R0903
         except IceStorm.NoSuchTopic:
             topic = topic_mgr.create(topic_name)
 
-       # topic.subscribeAndGetPublisher(qos, evt_ficheros)
+        topic.subscribeAndGetPublisher(qos, evt_ficheros)
 
-       # evento_orchestrators = OrchestratorEventI()
-       # evt_orchestrators = adapter.addWithUUID(evento_orchestrators)
-        
-       #broker.waitForShutdown()
+        evento_orchestrators = OrchestratorEventI()
+        evt_orchestrators = adapter.addWithUUID(evento_orchestrators)
+        topic_orchestrator = "OrchestratorSync"
+        qos = {}
+        try:
+            topicOrch = topic_mgr.retrieve(topic_orchestrator)
+        except IceStorm.NoSuchTopic:
+            topicOrch = topic_mgr.create(topic_orchestrator)
+
+        topicOrch.subscribeAndGetPublisher(qos, evt_orchestrators)
+
+        servant = OrchestratorI(files)
+        proxy_orchestrator_instance = adapter.add(servant, broker.stringToIdentity("orchestrator"))
+
+        servant.setProxy(proxy_orchestrator_instance)
+        servant.setTopicandDownloader(downloader_instance, topicOrch)
+        print(proxy_orchestrator_instance)
+
+        adapter.activate()
+        self.shutdownOnInterrupt()
+        broker.waitForShutdown()
         return 0
 
 class OrchestratorI(TrawlNet.Orchestrator): #pylint: disable=R0903
@@ -96,15 +113,20 @@ class OrchestratorI(TrawlNet.Orchestrator): #pylint: disable=R0903
     def announce(self, orchestrator, current=None):
         print("Recibido ",orchestrator)
 
-#class UpdateEventI(TrawlNet.UpdateEvent):
-   # files = {}
+class UpdateEventI(TrawlNet.UpdateEvent):
+    files = {}
   
-    
+    def newFile(self, fileInfo, current=None):
+        fileHash = fileInfo.hash
+        if fileHash not in self.files:
+            print(fileInfo.name)
+            print(fileInfo.hash)
+            self.files[fileHash] = fileInfo.name
                
                
-#class OrchestratorEventI(TrawlNet.OrchestratorEvent):
-    #def hello(self, orchestrator, current=None):
-        #orchestrator.announce(orchestrator)
+class OrchestratorEventI(TrawlNet.OrchestratorEvent):
+    def hello(self, orchestrator, current=None):
+        orchestrator.announce(orchestrator)
 
 
 

@@ -1,3 +1,1 @@
-dw -t -e 1.1:tcp -h 192.168.1.35 -p 5050 -t 60000
-Recibo  https://www.youtube.com/watch?v=CWhB1MB9Ifc
-Descargando  https://www.youtube.com/watch?v=CWhB1MB9Ifc
+downloader -t -e 1.1:tcp -h 192.168.1.39 -p 35889 -t 10000
