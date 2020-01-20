@@ -113,10 +113,6 @@ hay en el sistema.
 
 ``make run 
 ``
-En su defecto tendremos la posibilidad de ejecutar el run_server
-``
-./run_server.sh
-``
 * Paso 2 Ejecutar icegridgui. Introducimos en el terminal el siguiente comando.
 
 ``
@@ -143,6 +139,41 @@ Seleccionamos la Opcion de Conexion Directa
 <p align="center">
   <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 3 Conexion.png">
 </p>
+Seleccionamos la Conexion
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso4.png">
+</p>
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 5.png">
+</p>
+
+Introducimos un usuario y una contraseña
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 6.png">
+</p>
+
+
+Cargamos el XML
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 7.png">
+</p>
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 8.png">
+</p>
+
+Guardamos el Registry
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 10.png">
+</p>
+
+
+
+
 
 
 
