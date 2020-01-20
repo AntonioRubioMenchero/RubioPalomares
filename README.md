@@ -171,6 +171,45 @@ Guardamos el Registry
   <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 10.png">
 </p>
 
+Hacemos Patch Distribution
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/FotoExtra.png">
+</p>
+
+Levantamos Servidores Downloader y Orchestrator
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 11.png">
+</p>
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 12.png">
+</p>
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 13.png">
+</p>
+
+Una vez llegado a esta situacion abrimos un nuevo terminal (siempre en el directorio)
+
+``
+./client.py --Ice.Config=client.config "orchestrator"
+``
+Seleccionamos la Url de la cancion que queremos descargar
+``
+./client.py --Ice.Config=client.config "orchestrator" "--download" "url-de-la-cancion"
+``
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Extra2 .png">
+</p>
+
+Hacemos el tranfer en la cancion copiaremos el mensaje impreso por pantalla
+``
+./client.py --Ice.Config=client.config "orchestrator" "--transfer" "cancion.mp3"
+``
+
+Una vez realizados estos comandos podremos encontrar en el directorio el archivo .mp3 con la cancion descargada.
 
 
 
