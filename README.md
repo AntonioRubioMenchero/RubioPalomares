@@ -134,6 +134,17 @@ Creamos una Conexion, siguiendo los pasos.
   <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/New Connection.png">
 </p>
 
+Seleccionamos la Opcion de Conexion Directa
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 2 Conexion.png">
+</p>
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Paso 3 Conexion.png">
+</p>
+
+
 
 
 
