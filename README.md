@@ -35,15 +35,14 @@ La arquitectura se desarrollara en tres fases.
 ### Fase 1: Introduccion de los actores
 * Diagrama de la Arquitectura
  <p align="center">
-  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase1.png">
+  <img width="500" height="500" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase1.png">
 </p>
+
 ### Fase 2: Descarga y sincronización de componentes
 * Diagrama de la Arquitectura
  <p align="center">
   <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase2.png">
 </p>
-
-
 
 ### Fase 3: El sistema final
   * Diagrama de la Arquitectura
