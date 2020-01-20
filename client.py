@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 '''
-Cliente
+Client
 '''
+
 import sys
 import os
 import binascii
@@ -14,6 +15,9 @@ import TrawlNet # pylint: disable=E0401,C0413
 DOWNLOADS_DIRECTORY = './'
 
 def transfer_request(file_name, orchestrator):
+    '''
+    transfer request
+    '''
     remote_EOF = False
     BLOCK_SIZE = 1024
     transfer = None
@@ -40,21 +44,24 @@ def transfer_request(file_name, orchestrator):
 
 class Client(Ice.Application): # pylint: disable=R0903
     '''
-    Clase cliente
+    Client
     '''
     def run(self, argv):
         '''
-        Iniciar cliente
+        run
         '''
         broker = self.communicator()
         proxy = broker.stringToProxy(argv[1])
         orchestrator = TrawlNet.OrchestratorPrx.checkedCast(proxy)
 
-        if(len(argv)==2):
-            print(orchestrator.getFileList())
-        elif len(argv) == 4:
+        if len(argv) == 2:
+            songs = orchestrator.getFileList()
+            print(songs)
+
+        if len(argv) == 4:
             if argv[2] == '--download':
-                orchestrator.downloadTask(argv[3])
+                reply = orchestrator.downloadTask(argv[3])
+                print(reply)
             elif argv[2] == '--transfer':
                 transfer_request(argv[3], orchestrator)
 
