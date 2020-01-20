@@ -109,8 +109,20 @@ descargar, el nombre de un fichero para una transferencia y si no recibe nada li
 hay en el sistema.
    
 ### Ejecucion de la practica
-* Paso 1
-`` Ejecutar make run o ./run_server.sh ``
+* Paso 1 Ejecutar make run 
+
+``make run 
+``
+En su defecto tendremos la posibilidad de ejecutar el run_server
+``
+./run_server.sh
+``
+* Paso 2 Ejecutar icegridgui. Introducimos en el terminal el siguiente comando.
+
+``
+icegridgui
+``
+* Paso 3 
 
  
 
