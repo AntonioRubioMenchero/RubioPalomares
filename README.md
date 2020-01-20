@@ -110,7 +110,7 @@ hay en el sistema.
    
 ### Ejecucion de la practica
 * Paso 1
-´´ Ejecutar make run o ./run_server.sh ´´
+`` Ejecutar make run o ./run_server.sh ``
 
  
 
