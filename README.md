@@ -122,7 +122,20 @@ En su defecto tendremos la posibilidad de ejecutar el run_server
 ``
 icegridgui
 ``
-* Paso 3 
+* Paso 3
+
+Creamos una Conexion, siguiendo los pasos.
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/IceGrid.png">
+</p>
+
+<p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/New Connection.png">
+</p>
+
+
+
 
  
 
