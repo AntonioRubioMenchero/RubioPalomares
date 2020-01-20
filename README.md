@@ -37,8 +37,8 @@ La arquitectura se desarrollara en tres fases.
 
 ### Fase 3: El sistema final
   * Diagrama de la Arquitectura
-  <p align="center">
-  <img width="450" height="450" src="">
+ <p align="center">
+  <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase.png">
 </p>
 En la tercera fase el sistema se compondra de un cliente, tres orchestrators, una factoria de
 downloaders y una factoria de transfers. 
