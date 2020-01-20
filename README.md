@@ -33,18 +33,35 @@ La arquitectura se desarrollara en tres fases.
 * Fase 3: El sistema final
 
 ### Fase 1: Introduccion de los actores
+* Objetivo
+En la primera fase el sistema se compondrá de un cliente, un orchestrator y un downloader. El
+cliente tendrá que mandar un URL en forma de string al orchestrator que, a su vez, redirigirá la
+petición al downloader. Orchestrator y downloader mostrarán que se ha recibido la petición
+imprimiendo por línea de comandos
+
 * Diagrama de la Arquitectura
  <p align="center">
   <img width="700" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase1.png">
 </p>
 
 ### Fase 2: Descarga y sincronización de componentes
+* Objetivo
+En la segunda fase el sistema se compondrá de un cliente, uno o varios orchestrators y uno o varios
+downloaders. El cliente tendrá que mandar un URL en forma de string a uno de los orchestrators
+que, a su vez, redirigirá la petición a uno de sus downloader si el fichero de audio no ha sido
+descargado previamente en el sistema. El downloader descargará el archivo y notificará que se ha
+descargado correctamente en un canal de eventos para que todos los orchestrators sepan que el
+fichero existe, mandando la información de ese fichero. Los orchestrators se anunciarán al resto de
+orchestrators en su creación, que se anunciarán a su vez al nuevo orchestrator para actualizar las
+listas de orchestrators existentes de cada objeto
+
 * Diagrama de la Arquitectura
  <p align="center">
   <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase2.png">
 </p>
 
 ### Fase 3: El sistema final
+En paso sera la continuación de los anteriores por lo tanto todos los componentes de las anteriores Fases estaran presentes en la fase 3.
   * Diagrama de la Arquitectura
  <p align="center">
   <img width="450" height="450" src="https://github.com/4Paloms/RubioPalomares/blob/master/Fase.png">
@@ -92,6 +109,8 @@ descargar, el nombre de un fichero para una transferencia y si no recibe nada li
 hay en el sistema.
    
 ### Ejecucion de la practica
+Paso 1
+´´ Ejecutar make run o ./run_server.sh ``
 
  
 
