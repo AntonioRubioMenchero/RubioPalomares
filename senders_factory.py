@@ -3,6 +3,7 @@
 
 import sys
 import Ice
+import binascii
 Ice.loadSlice('-I. --all trawlnet.ice')
 import TrawlNet
 
@@ -10,38 +11,33 @@ import TrawlNet
 
 
 class SenderI(TrawlNet.Sender):
-    def __init__(self, name):
-        self.name = name
-
-    def receive(self,size):
-        print("{0}: {1}".format(self.name, message))
-        sys.stdout.flush()
-        return 'recibido'
+    def __init__(self,filename):
+        self.filename=open(filename,'rb')
+    def close(self,current):
+        self.filename.close()
+    def destroy(self,current):
+        current.adapter.remove(Ice.stringToIdentity(self))
+    def receive(self,size,current):
+        return str(binascii.b2a_base64(self.filename.read(size),newline=False))
     
 
 
 class SenderFactoryI(TrawlNet.SenderFactory):
-    def __init__(self):
-
-
     def create(self, filename, current=None):
 
         if name in self.servants:
             raise 'Este Archivo ya esta en trasferencia'
-
         servant = SenderI(filename)
         proxy = current.adapter.addWithUUID(servant)
-
-        return proxy.stringToIdentity(proxy)
+        return TrawlNet.SenderPrx.checkedCast(proxy)
 
 
 class Server(Ice.Application):
     def run(self, argv):
-        broker = self.communicator()
-        
 
+
+        broker = self.communicator()
         adapter = broker.createObjectAdapter("SenderFactoryAdapter")
-       
         factory = SenderFactoryI()
         proxy = adapter.add(factory,broker.stringToIdentity("SenderFactory1"))
         print(proxy)
@@ -52,6 +48,8 @@ class Server(Ice.Application):
         adapter.activate()
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
+
+        print('SenderFactory Finalizado')
 
         return 0
 
