@@ -29,10 +29,10 @@ class TransferI(TrawlNet.Transfer):
                 print(transfer)
                 if not transfer:
                     raise RuntimeError ('Invalid')
-                #SALTA ConnectTimeoutException
+                print("Llegamos")
                 receiver=self.receiver_factory.create(element,sender_prx,transfer)
-                receiver_prx = current.adapter.addWithUUID(receiver)
-                receiverList.append(receiver_prx)
+                print(receiver)
+                receiverList.append(receiver)
             else:
                 print("El archivo " + element + " no se encuentra en el directorio " + DIRECTORY)
         return receiverList

@@ -36,6 +36,8 @@ class Client(Ice.Application):
             if not factory:
               raise RuntimeError ('Invalid')
 
+            ##ACTIVAMOS ADAPTADOR
+            adapter.activate()
 
             print('Archivos introducidos:')
 
@@ -65,7 +67,7 @@ class ReceiverI(TrawlNet.Receiver):
     return 0
 
 class ReceiverFactoryI(TrawlNet.ReceiverFactory):
-  def create(self,filename,sender,transfer):
+  def create(self,filename,sender,transfer,current=None):
     print("Creando Receiver")
     servant = ReceiverI(filename,sender,transfer)
     proxy = current.adapter.addWithUUID(servant)
