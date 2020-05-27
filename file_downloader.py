@@ -17,19 +17,21 @@ def get_files(argv):
 
 class Client(Ice.Application):
     def run(self, argv):
+            print('Running Client')
             fileList=[]
 
             broker=self.communicator()
             adapter=broker.createObjectAdapter('ReceiverFactoryAdapter')
             servant=ReceiverFactoryI()
-
             receiver_prx=adapter.add(servant,broker.stringToIdentity('ReceiverFactory1'))
 
 
-            print('Running Client')
+           
+
             proxy=self.communicator().stringToProxy(argv[1])
-            
             factory=TrawlNet.TransferFactoryPrx.checkedCast(proxy)
+
+            
 
             if not factory:
               raise RuntimeError ('Invalid')
@@ -40,10 +42,10 @@ class Client(Ice.Application):
             fileList=get_files(argv)
             
 
-            
             transfer=factory.newTransfer(TrawlNet.ReceiverFactoryPrx.checkedCast(receiver_prx))
-            TrawlNet.TransferPrx.checkedCast(transfer)
-            transfer.createPeers(fileList)
+            print(transfer)
+            List=transfer.createPeers(fileList)
+            print(List)
 
             adapter.activate()
 
@@ -64,7 +66,8 @@ class ReceiverI(TrawlNet.Receiver):
 
 class ReceiverFactoryI(TrawlNet.ReceiverFactory):
   def create(self,filename,sender,transfer):
-    servant = ReceiverI(filename)
+    print("Creando Receiver")
+    servant = ReceiverI(filename,sender,transfer)
     proxy = current.adapter.addWithUUID(servant)
     return TrawlNet.ReceiverPrx.checkedCast(proxy)
     

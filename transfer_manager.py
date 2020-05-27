@@ -9,24 +9,34 @@ import IceStorm
 from util import *
 
 DIRECTORY = './files/'
+auxfactory=""
 
 class TransferI(TrawlNet.Transfer):
+        
+    transfer_prx = None
+    
     def __init__(self, receiver_factory):
         self.receiver_factory=receiver_factory
+        self.sender_factory=auxfactory
 
     def createPeers(self,fileList,current):
         print('Creando Parejas') 
         receiverList=[]
         for element in fileList:
             if(verifyfile(DIRECTORY,element)):
-                #PREGUNTAR como comunicar
-                transfer=
-                sender=
-                receiver=self.receiver_factory(element,,)
-                receiverList.append(TrawlNet.ReceiverPrx(receiver))
+                sender_prx=self.sender_factory.create(element)
+                transfer=TrawlNet.TransferPrx.checkedCast(self.transfer_prx)
+                print(transfer)
+                if not transfer:
+                    raise RuntimeError ('Invalid')
+                #SALTA ConnectTimeoutException
+                receiver=self.receiver_factory.create(element,sender_prx,transfer)
+                receiver_prx = current.adapter.addWithUUID(receiver)
+                receiverList.append(receiver_prx)
             else:
                 print("El archivo " + element + " no se encuentra en el directorio " + DIRECTORY)
         return receiverList
+        
     def destroyPeer(self,current):
         pass
     def destroy(self):
@@ -34,16 +44,12 @@ class TransferI(TrawlNet.Transfer):
 
     
 class TransferFactoryI(TrawlNet.TransferFactory):
-    
     def newTransfer(self,receiver_factory,current=None):
         print('Creando Transfer')
         transfer_servant= TransferI(receiver_factory)
-        proxy = current.adapter.addWithUUID(transfer_servant)
-        print(proxy)
+        proxy=current.adapter.addWithUUID(transfer_servant)
+        transfer_servant.transfer_prx=proxy
         return TrawlNet.TransferPrx.checkedCast(proxy)
-
-
-
 
 class Server(Ice.Application):
     def run(self,argv):
@@ -56,12 +62,22 @@ class Server(Ice.Application):
         proxy=adapter.add(factory, broker.stringToIdentity("TransferFactory1"))
         print(proxy)
 
+        global auxfactory
+
+
+        senderfactory_prx=self.communicator().stringToProxy(argv[1])
+        print(TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx))
+        auxfactory=TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx)
+
         adapter.activate()
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
         print('Transfer acabado')
 
+       
+
         return 0
+
 
 class PeerInfo(TrawlNet.PeerInfo):
     def __init__(self,transfer=None,filename=''):

@@ -12,7 +12,7 @@ import TrawlNet
 
 class SenderI(TrawlNet.Sender):
     def __init__(self,filename):
-        self.filename=open(filename,'rb')
+        self.filename=filename
     def close(self,current):
         self.filename.close()
     def destroy(self,current):
@@ -24,11 +24,9 @@ class SenderI(TrawlNet.Sender):
 
 class SenderFactoryI(TrawlNet.SenderFactory):
     def create(self, filename, current=None):
-
-        if name in self.servants:
-            raise 'Este Archivo ya esta en trasferencia'
         servant = SenderI(filename)
         proxy = current.adapter.addWithUUID(servant)
+        print("Estoy aqui")
         return TrawlNet.SenderPrx.checkedCast(proxy)
 
 
