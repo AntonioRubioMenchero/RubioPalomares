@@ -7,18 +7,21 @@ import binascii
 Ice.loadSlice('-I. --all trawlnet.ice')
 import TrawlNet
 
+DIRECTORY = './files/'
 
 
 
 class SenderI(TrawlNet.Sender):
     def __init__(self,filename):
-        self.filename=filename
-    def close(self,current):
-        self.filename.close()
-    def destroy(self,current):
-        current.adapter.remove(Ice.stringToIdentity(self))
-    def receive(self,size,current):
-        return str(binascii.b2a_base64(self.filename.read(size),newline=False))
+        self.file_=open(DIRECTORY+filename, 'rb')
+    def close(self,current=None):
+        self.file_.close()
+    def destroy(self,current=None):
+        current.adapter.remove(current.id)
+        print("SE HA ELIMINADO DEL ADAPTADOR")
+    def receive(self,size,current=None):
+        print("Se empiezan a enviar datos con tamaño " + str(size) )
+        return str(binascii.b2a_base64(self.file_.read(size),newline=False))
     
 
 
@@ -32,8 +35,6 @@ class SenderFactoryI(TrawlNet.SenderFactory):
 
 class Server(Ice.Application):
     def run(self, argv):
-
-
         broker = self.communicator()
         adapter = broker.createObjectAdapter("SenderFactoryAdapter")
         factory = SenderFactoryI()

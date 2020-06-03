@@ -6,6 +6,7 @@ import Ice
 Ice.loadSlice('-I. --all trawlnet.ice')
 import TrawlNet
 import IceStorm
+import os
 from util import *
 
 DIRECTORY = './files/'
@@ -30,17 +31,18 @@ class TransferI(TrawlNet.Transfer):
                 if not transfer:
                     raise RuntimeError ('Invalid')
                 print("Llegamos")
-                receiver=self.receiver_factory.create(element,sender_prx,transfer)
-                print(receiver)
-                receiverList.append(receiver)
+                receiver_prx=self.receiver_factory.create(element,sender_prx,transfer)
+                print(receiver_prx)
+                receiverList.append(receiver_prx)
             else:
                 print("El archivo " + element + " no se encuentra en el directorio " + DIRECTORY)
         return receiverList
         
     def destroyPeer(self,current):
         pass
-    def destroy(self):
-        pass
+    def destroy(self,current=None):
+        current.adapter.remove(current.id)
+        print("SE HA ELIMINADO DEL ADAPTADOR")
 
     
 class TransferFactoryI(TrawlNet.TransferFactory):
@@ -53,8 +55,6 @@ class TransferFactoryI(TrawlNet.TransferFactory):
 
 class Server(Ice.Application):
     def run(self,argv):
-        
-
         broker = self.communicator()
         properties=broker.getProperties()
         factory=TransferFactoryI()
@@ -63,7 +63,6 @@ class Server(Ice.Application):
         print(proxy)
 
         global auxfactory
-
 
         senderfactory_prx=self.communicator().stringToProxy(argv[1])
         print(TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx))
