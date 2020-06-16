@@ -27,9 +27,13 @@ class SenderI(TrawlNet.Sender):
 
 class SenderFactoryI(TrawlNet.SenderFactory):
     def create(self, filename, current=None):
+        try:
+            open(DIRECTORY+filename,'r')
+        except TrawlNet.FileDoesNotExistError as e:
+            print(e.info)
+            raise TrawlNet.FileDoesNotExistError () 
         servant = SenderI(filename)
         proxy = current.adapter.addWithUUID(servant)
-        print("Estoy aqui")
         return TrawlNet.SenderPrx.checkedCast(proxy)
 
 

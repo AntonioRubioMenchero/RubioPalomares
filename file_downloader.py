@@ -45,7 +45,13 @@ class Client(Ice.Application):
 
             transfer=factory.newTransfer(TrawlNet.ReceiverFactoryPrx.checkedCast(receiver_prx))
             print(transfer)
-            receiverList=transfer.createPeers(fileList)
+
+            try:
+              receiverList=transfer.createPeers(fileList)
+            except TrawlNet.FileDoesNotExistError as e:
+              print (e)
+              raise TrawlNet.FileDoesNotExistError("Error")
+            
 
             for element in receiverList:
               element.start()
