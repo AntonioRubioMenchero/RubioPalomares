@@ -12,17 +12,14 @@ from util import *
 DIRECTORY = './files/'
 KEY='IceStorm.TopicManager.Proxy'
 auxfactory=""
-queuTransfers={}
 
 class TransferI(TrawlNet.Transfer):
         
     transfer_prx = None
     
-    def __init__(self, receiver_factory,peer_topic,transfer_topic):
+    def __init__(self, receiver_factory):
         self.receiver_factory=receiver_factory
         self.sender_factory=auxfactory
-        self.peer_topic=peer_topic
-        self.peer_publisher = TrawlNet.PeerEventPrx.uncheckedCast(self.peer_topic.getPublisher())
 
     def createPeers(self,fileList,current):
         print('Creando Parejas') 
@@ -56,18 +53,24 @@ class TransferFactoryI(TrawlNet.TransferFactory):
         self.transfer_topic=transfer_topic
         self.peer_topic=peer_topic
         self.transfer_topic=transfer_topic
-        self.transfer_publisher = TrawlNet.TransferEventPrx.uncheckedCast(self.transfer_topic.getPublisher())
-
 
     def newTransfer(self,receiver_factory,current=None):
         print('Creando Transfer')
         print(self.peer_topic)
         print(self.transfer_topic)
-        transfer_servant= TransferI(receiver_factory,self.peer_topic,self.transfer_topic)
+
+        transfer_servant= TransferI(receiver_factory)
         proxy=current.adapter.addWithUUID(transfer_servant)
         transfer_servant.transfer_prx=proxy
-        self.transfer_topic.subscribeAndGetPublisher(queuTransfers,proxy)
-        print(queuTransfers)
+
+        self.transfer_topic.subscribeAndGetPublisher({},proxy)
+
+        publisher = self.transfer_topic.getPublisher()
+        printer = TrawlNet.TransferEventPrx.uncheckedCast(publisher)
+
+        print(printer)
+
+        printer.transferFinished(TrawlNet.TransferPrx.uncheckedCast(proxy))
 
         return TrawlNet.TransferPrx.checkedCast(proxy)
 
@@ -116,33 +119,19 @@ class Server(Ice.Application):
         print(TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx))
         auxfactory=TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx)
 
-        eventT=TransferEventI()
-        print(eventT.quot)
-        eventT_prx=adapter.addWithUUID(eventT)
-        print(eventT_prx)
-
-        eventP=PeerEventI()
-        print(eventP.quop)
-        eventP_prx=adapter.addWithUUID(eventP)
-        print(eventP_prx)
-
         adapter.activate()
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
         print('Transfer acabado')
 
-       
-
         return 0
 
 class PeerEventI(TrawlNet.PeerEvent):
-    quop=[]
     def peerFinished(self, peer, current=None):
         print("Pareja ha acabado de realizar descarga")
 class TransferEventI(TrawlNet.TransferEvent):
-    quot=[]
-    def transferFinished(self,transfer,current=None):
-        print("Transferencia finalizada")
+    def transferFinished(self,transfer,current = None):
+        print('Transferencia finalizada')
         
 
 transfer= Server()
