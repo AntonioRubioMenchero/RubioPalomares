@@ -14,7 +14,7 @@ DOWNLOADS_DIRECTORY="./downloads/"
 def get_files(argv):
       fileList=[]
       for i in range(len(argv)): 
-        if(i>1):
+        if(i>0):
           fileList.append(argv[i])
           print(argv[i])
       return fileList
@@ -29,7 +29,7 @@ class Client(Ice.Application):
             servant=ReceiverFactoryI()
             receiver_prx=adapter.add(servant,broker.stringToIdentity('ReceiverFactory1'))
 
-            proxy=self.communicator().stringToProxy(argv[1])
+            proxy=self.communicator().stringToProxy('TransferFactory1 -t -e 1.1 @ TransferFactory1')
             factory=TrawlNet.TransferFactoryPrx.checkedCast(proxy)
 
             if not factory:
@@ -75,7 +75,6 @@ class ReceiverI(TrawlNet.Receiver):
     print("Empieza la descarga del archivo " + self.filename)
     self.download_request(self.filename)
    
-    return "Descarga finalizada"
   def destroy(self,current=None):
     print("Se ha eliminado del adapter")
     current.adapter.remove(current.id)
@@ -105,6 +104,11 @@ class ReceiverI(TrawlNet.Receiver):
                 file_.write(data)
         self.sender.close()
 
+        ## EMITIR EVENTO PEERFINISHED
+        ##peerInfo=TrawlNet.PeerInfo()
+        ##peerInfo.transfer=
+        ##peerInfo.filename=
+
     self.sender.destroy()
     print('Descarga del archivo ' + filename + " finalizada")
   
@@ -116,6 +120,10 @@ class ReceiverFactoryI(TrawlNet.ReceiverFactory):
     servant = ReceiverI(filename,sender,transfer)
     proxy = current.adapter.addWithUUID(servant)
     return TrawlNet.ReceiverPrx.checkedCast(proxy)
+
+class TransferEventI(TrawlNet.TransferEvent):
+    def transferFinished(self,transfer,current = None):
+        print('Transferencia finalizada')
     
   
 sys.exit(Client().main(sys.argv))

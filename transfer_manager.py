@@ -115,7 +115,7 @@ class Server(Ice.Application):
 
         global auxfactory
 
-        senderfactory_prx=self.communicator().stringToProxy(argv[1])
+        senderfactory_prx=self.communicator().stringToProxy('SenderFactory1 -t -e 1.1 @ SenderFactory1')
         print(TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx))
         auxfactory=TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx)
 
@@ -129,9 +129,7 @@ class Server(Ice.Application):
 class PeerEventI(TrawlNet.PeerEvent):
     def peerFinished(self, peer, current=None):
         print("Pareja ha acabado de realizar descarga")
-class TransferEventI(TrawlNet.TransferEvent):
-    def transferFinished(self,transfer,current = None):
-        print('Transferencia finalizada')
+
         
 
 transfer= Server()
