@@ -31,7 +31,7 @@ class SenderFactoryI(TrawlNet.SenderFactory):
             open(DIRECTORY+filename,'r')
         except TrawlNet.FileDoesNotExistError as e:
             print(e.info)
-            raise TrawlNet.FileDoesNotExistError () 
+            raise TrawlNet.FileDoesNotExistError ("Error") 
         servant = SenderI(filename)
         proxy = current.adapter.addWithUUID(servant)
         return TrawlNet.SenderPrx.checkedCast(proxy)

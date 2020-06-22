@@ -16,7 +16,7 @@ auxfactory=""
 class TransferI(TrawlNet.Transfer):
         
     transfer_prx = None
-    
+    dicPeers={}
     def __init__(self, receiver_factory):
         self.receiver_factory=receiver_factory
         self.sender_factory=auxfactory
@@ -38,39 +38,37 @@ class TransferI(TrawlNet.Transfer):
 
             receiver_prx=self.receiver_factory.create(element,sender_prx,transfer)
             print(receiver_prx)
+            self.dicPeers.setdefault(element,[receiver_prx,sender_prx])
             receiverList.append(receiver_prx)
         return receiverList
         
-    def destroyPeer(self,current):
-        pass
+    def destroyPeer(self, filename, current= None):
+        receiver=self.dicPeers[filename][0]
+        sender=self.dicPeers[filename][1]
+
+        sender.destroy()
+        receiver.destroy()
     def destroy(self,current=None):
         current.adapter.remove(current.id)
         print("SE HA ELIMINADO DEL ADAPTADOR")
 
     
 class TransferFactoryI(TrawlNet.TransferFactory):
-    def __init__(self,transfer_topic,peer_topic):
-        self.transfer_topic=transfer_topic
-        self.peer_topic=peer_topic
-        self.transfer_topic=transfer_topic
+    # def __init__(self,peer_topic):
+    #    # self.transfer_topic=transfer_topic
+    #     self.peer_topic=peer_topic
 
     def newTransfer(self,receiver_factory,current=None):
         print('Creando Transfer')
-        print(self.peer_topic)
-        print(self.transfer_topic)
+        #print(self.peer_topic)
+        #print(self.transfer_topic)
 
         transfer_servant= TransferI(receiver_factory)
         proxy=current.adapter.addWithUUID(transfer_servant)
         transfer_servant.transfer_prx=proxy
 
-        self.transfer_topic.subscribeAndGetPublisher({},proxy)
-
-        publisher = self.transfer_topic.getPublisher()
-        printer = TrawlNet.TransferEventPrx.uncheckedCast(publisher)
-
-        print(printer)
-
-        printer.transferFinished(TrawlNet.TransferPrx.uncheckedCast(proxy))
+        
+        
 
         return TrawlNet.TransferPrx.checkedCast(proxy)
 
@@ -94,24 +92,28 @@ class Server(Ice.Application):
 
     def run(self,argv):
 
-        broker = self.communicator()
+        broker= self.communicator()
+
+    
+        factory=TransferFactoryI()
+        adapter = broker.createObjectAdapter("TransferFactoryAdapter")
+        proxy=adapter.add(factory, broker.stringToIdentity("TransferFactory1"))
+        print(proxy)
 
         topic_mng=self.get_topic_manager()
         if not topic_mng:
             print ("Error en el proxy del canal de evento")
             return 2
         
-        transfer_topic = self.get_topic(topic_mng, 'TransferTopic')
-        
+        peer_broker = self.communicator()
+        peer_adapter= peer_broker.createObjectAdapter("PeerEventAdapter")
+        servant=PeerEventI()
+        subscriber=peer_adapter.addWithUUID(servant)
         peer_topic = self.get_topic(topic_mng, 'PeerTopic')
-        
-        print (transfer_topic)
-        
+        qos= {}
 
-        factory=TransferFactoryI(transfer_topic,peer_topic)
-        adapter = broker.createObjectAdapter("TransferFactoryAdapter")
-        proxy=adapter.add(factory, broker.stringToIdentity("TransferFactory1"))
-        print(proxy)
+        peer_topic.subscribeAndGetPublisher(qos, subscriber)
+        
 
         global auxfactory
 
@@ -119,6 +121,7 @@ class Server(Ice.Application):
         print(TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx))
         auxfactory=TrawlNet.SenderFactoryPrx.checkedCast(senderfactory_prx)
 
+        peer_adapter.activate()
         adapter.activate()
         self.shutdownOnInterrupt()
         broker.waitForShutdown()
@@ -127,7 +130,8 @@ class Server(Ice.Application):
         return 0
 
 class PeerEventI(TrawlNet.PeerEvent):
-    def peerFinished(self, peer, current=None):
+    def peerFinished(self, peer,current=None):
+        peer.transfer.destroyPeer(peer.fileName)
         print("Pareja ha acabado de realizar descarga")
 
         
