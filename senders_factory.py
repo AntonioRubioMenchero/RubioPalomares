@@ -10,28 +10,29 @@ import TrawlNet
 DIRECTORY = './files/'
 
 
-
 class SenderI(TrawlNet.Sender):
-    def __init__(self,filename):
-        self.file_=open(DIRECTORY+filename, 'rb')
-    def close(self,current=None):
+    def __init__(self, filename):
+        self.file_ = open(DIRECTORY + filename, 'rb')
+
+    def close(self, current=None):
         self.file_.close()
-    def destroy(self,current=None):
+
+    def destroy(self, current=None):
         current.adapter.remove(current.id)
         print("SE HA ELIMINADO DEL ADAPTADOR")
-    def receive(self,size,current=None):
-        print("Se empiezan a enviar datos con tamaño " + str(size) )
-        return str(binascii.b2a_base64(self.file_.read(size),newline=False))
-    
+
+    def receive(self, size, current=None):
+        print("Se empiezan a enviar datos con tamaño " + str(size))
+        return str(binascii.b2a_base64(self.file_.read(size), newline=False))
 
 
 class SenderFactoryI(TrawlNet.SenderFactory):
     def create(self, filename, current=None):
         try:
-            open(DIRECTORY+filename,'r')
+            open(DIRECTORY + filename, 'r')
         except TrawlNet.FileDoesNotExistError as e:
             print(e.info)
-            raise TrawlNet.FileDoesNotExistError ("Error") 
+            raise TrawlNet.FileDoesNotExistError("Error")
         servant = SenderI(filename)
         proxy = current.adapter.addWithUUID(servant)
         return TrawlNet.SenderPrx.checkedCast(proxy)
@@ -42,9 +43,8 @@ class Server(Ice.Application):
         broker = self.communicator()
         adapter = broker.createObjectAdapter("SenderFactoryAdapter")
         factory = SenderFactoryI()
-        proxy = adapter.add(factory,broker.stringToIdentity("SenderFactory1"))
+        proxy = adapter.add(factory, broker.stringToIdentity("SenderFactory1"))
         print(proxy)
-
 
         sys.stdout.flush()
 
