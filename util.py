@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import os
 
 
-def verifyfile(repository, filename):
-    print('Verificando archivo ' + filename + ' en el directorio ' +
-          repository)
-    dir = repository + filename
-    return os.path.isfile(dir)
+def isEmpty(dictionary):
+   for element in dictionary:
+     if element:
+       return True
+     return False

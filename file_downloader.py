@@ -6,7 +6,7 @@ import binascii
 import os
 import Ice
 Ice.loadSlice('-I. --all trawlnet.ice')
-import TrawlNet
+import TrawlNet 
 import IceStorm
 
 DOWNLOADS_DIRECTORY = "./downloads/"
@@ -16,7 +16,7 @@ KEY = 'IceStorm.TopicManager.Proxy'
 def get_files(argv):
     fileList = []
     for i in range(len(argv)):
-        if (i > 0):
+        if i > 0:
             fileList.append(argv[i])
             print(argv[i])
     return fileList
@@ -40,7 +40,6 @@ class Client(Ice.Application):
             return topic_mng.create(topicName)
 
     def run(self, argv):
-
         print('Running Client')
         fileList = []
         broker = self.communicator()
@@ -69,22 +68,42 @@ class Client(Ice.Application):
 
         print('Archivos introducidos:')
 
+
+        topic_mng = self.get_topic_manager()
+        if not topic_mng:
+            print("Error en el proxy del canal de evento")
+            return 2
+
+
+
+
         fileList = get_files(argv)
 
         transfer = factory.newTransfer(
             TrawlNet.ReceiverFactoryPrx.checkedCast(receiver_prx))
         print(transfer)
 
+        transfer_broker = self.communicator()
+        transfer_adapter = transfer_broker.createObjectAdapter("TransferEventAdapter")
+        servant = TransferEventI(transfer,broker)
+        transfer_topic = self.get_topic(topic_mng, 'TransferTopic')
+        subscriber = transfer_adapter.addWithUUID(servant)
+        qos = {}
+
+        transfer_topic.subscribeAndGetPublisher(qos, subscriber)
+
+        transfer_adapter.activate()
+
         try:
             receiverList = transfer.createPeers(fileList)
         except TrawlNet.FileDoesNotExistError as e:
-            print(e)
-            raise TrawlNet.FileDoesNotExistError("Error")
+            print("El fichero " + str(e) + " no existe")
+            return 1
 
         for element in receiverList:
             element.start()
 
-        transfer.destroy()
+        broker.waitForShutdown()
 
         return 0
 
@@ -156,8 +175,14 @@ class ReceiverFactoryI(TrawlNet.ReceiverFactory):
 
 
 class TransferEventI(TrawlNet.TransferEvent):
+    def __init__(self, transfer, broker):
+        self.transfer = transfer
+        self.broker = broker
+
     def transferFinished(self, transfer, current=None):
+        print('Se lanza evento finalizar transfer')
         transfer.destroy()
+        self.broker.shutdown()
 
 
 sys.exit(Client().main(sys.argv))
