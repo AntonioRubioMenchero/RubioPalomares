@@ -1,7 +1,6 @@
 #!/usr/bin/python3.6 -u
 # -*- coding: utf-8 -*-
 
-
 import sys
 import Ice
 import IceStorm
@@ -9,7 +8,6 @@ Ice.loadSlice('-I. --all trawlnet.ice')
 import TrawlNet  #pylint: disable=E1101
 
 
-from util import *
 
 DIRECTORY = './files/'
 KEY = 'IceStorm.TopicManager.Proxy'
@@ -33,11 +31,9 @@ class TransferI(TrawlNet.Transfer):
             try:
                 sender_prx = self.sender_factory.create(element)
             except TrawlNet.FileDoesNotExistError as e:
-                raise (e)
+                raise e
 
             transfer = TrawlNet.TransferPrx.checkedCast(self.transfer_prx)
-
-            print(transfer)
 
             if not transfer:
                 raise RuntimeError('Invalid')
@@ -49,32 +45,32 @@ class TransferI(TrawlNet.Transfer):
             receiverList.append(receiver_prx)
         return receiverList
 
-    def destroyPeer(self, filename, current=None):
+    def destroyPeer(self, filename, current=None):#pylint: disable = W0613
         receiver = self.dicPeers[filename][0]
         sender = self.dicPeers[filename][1]
 
         sender.destroy()
         receiver.destroy()
 
-        ## deleteamos
+        del self.dicPeers[filename]
 
-        ## if not 
+        print("Eliminamos pareja del diccionario asociada a " + filename + " receiver " + str(receiver) + " y sender " + str(sender))
 
-        if isEmpty(self.dicPeers):
+
+        if not self.dicPeers:
             self.transfer_topic.transferFinished(TrawlNet.TransferPrx.checkedCast(
                 self.transfer_prx))
 
     def destroy(self, current=None):
         current.adapter.remove(current.id)
-        print("SE HA ELIMINADO DEL ADAPTADOR")
-
+        print("Se destruye el transfer " + str(self.transfer_prx))
 
 class TransferFactoryI(TrawlNet.TransferFactory):
 
-    def __init__(self, transfer_topic, current=None):
+    def __init__(self, transfer_topic, current=None): #pylint: disable = W0613
         self.transfer_topic = transfer_topic
 
-    def newTransfer(self, receiver_factory, current=None):
+    def newTransfer(self, receiver_factory, current=None):#pylint: disable = W0613
         print('Creando Transfer')
         transfer_servant = TransferI(receiver_factory)
         proxy = current.adapter.addWithUUID(transfer_servant)
@@ -94,14 +90,15 @@ class Server(Ice.Application):
         return IceStorm.TopicManagerPrx.checkedCast(proxy)
 
     @staticmethod
-    def get_topic(topic_mng, topicName):
+    def get_topic(topic_mng, topic_Name):
         try:
-            return topic_mng.retrieve(topicName)
+            return topic_mng.retrieve(topic_Name)
         except IceStorm.NoSuchTopic:
-            print("No topic {} found, creating".format(topicName))
-            return topic_mng.create(topicName)
+            print("No topic {} found, creating".format(topic_Name))
+            return topic_mng.create(topic_Name)
 
-    def run(self, argv):
+    def run(self, argv):#pylint: disable = W0613
+        print('Transfer Manager Running')
 
         broker = self.communicator()
 
@@ -109,14 +106,13 @@ class Server(Ice.Application):
         if not topic_mng:
             print("Error en el proxy del canal de evento")
             return 2
-        
         transfer_topic = self.get_topic(topic_mng, 'TransferTopic')
 
 
         publisher_transferEvent = transfer_topic.getPublisher()
-        transferE = TrawlNet.TransferEventPrx.uncheckedCast(publisher_transferEvent)
+        transfer_event = TrawlNet.TransferEventPrx.uncheckedCast(publisher_transferEvent) 
 
-        factory = TransferFactoryI(transferE)
+        factory = TransferFactoryI(transfer_event)
         adapter = broker.createObjectAdapter("TransferFactoryAdapter")
         proxy = adapter.add(factory,
                             broker.stringToIdentity("TransferFactory1"))
@@ -132,7 +128,7 @@ class Server(Ice.Application):
 
         peer_topic.subscribeAndGetPublisher(qos, subscriber)
 
-        global AUXFACTORY
+        global AUXFACTORY #pylint: disable = W0613
 
         senderfactory_prx = self.communicator().stringToProxy(
             'SenderFactory1 -t -e 1.1 @ SenderFactory1')
@@ -149,7 +145,7 @@ class Server(Ice.Application):
 
 
 class PeerEventI(TrawlNet.PeerEvent):
-    def peerFinished(self, peer, current=None):
+    def peerFinished(self, peer, current=None): #pylint: disable = W0613
         peer.transfer.destroyPeer(peer.fileName)
         print("Pareja ha acabado de realizar descarga")
 

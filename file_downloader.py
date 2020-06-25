@@ -14,6 +14,7 @@ KEY = 'IceStorm.TopicManager.Proxy'
 
 
 def get_files(argv):
+    print('Archivos introducidos:')
     fileList = []
     for i in range(len(argv)):
         if i > 0:
@@ -66,7 +67,7 @@ class Client(Ice.Application):
         ##ACTIVAMOS ADAPTADOR
         adapter.activate()
 
-        print('Archivos introducidos:')
+        
 
 
         topic_mng = self.get_topic_manager()
@@ -74,18 +75,15 @@ class Client(Ice.Application):
             print("Error en el proxy del canal de evento")
             return 2
 
-
-
-
         fileList = get_files(argv)
 
         transfer = factory.newTransfer(
             TrawlNet.ReceiverFactoryPrx.checkedCast(receiver_prx))
-        print(transfer)
+        print('Transfer: '+ str(transfer))
 
         transfer_broker = self.communicator()
         transfer_adapter = transfer_broker.createObjectAdapter("TransferEventAdapter")
-        servant = TransferEventI(transfer,broker)
+        servant = TransferEventI(transfer, broker)
         transfer_topic = self.get_topic(topic_mng, 'TransferTopic')
         subscriber = transfer_adapter.addWithUUID(servant)
         qos = {}
@@ -104,6 +102,7 @@ class Client(Ice.Application):
             element.start()
 
         broker.waitForShutdown()
+
 
         return 0
 
@@ -125,14 +124,12 @@ class ReceiverI(TrawlNet.Receiver):
         peerInfo.transfer = self.transfer
         peerInfo.fileName = self.filename
 
-        print(self.peer_topic)
         peerE = TrawlNet.PeerEventPrx.uncheckedCast(
             self.peer_topic.getPublisher())
-        print(peerE)
         peerE.peerFinished(peerInfo)
 
     def destroy(self, current=None):
-        print("Se ha eliminado del adapter")
+        print("Se destruye el receiver "+ str(self.receiver))
         current.adapter.remove(current.id)
 
     ##Código extraido del transfer_factory dado por los profesores en Conv Ordinaria
@@ -162,10 +159,10 @@ class ReceiverI(TrawlNet.Receiver):
 
 
 class ReceiverFactoryI(TrawlNet.ReceiverFactory):
-    def __init__(self, peer_topic, current=None):
+    def __init__(self, peer_topic, current=None):#pylint: disable = W0613
         self.peer_topic = peer_topic
 
-    def create(self, filename, sender, transfer, current=None):
+    def create(self, filename, sender, transfer, current=None):#pylint: disable = W0613
         print("Creando Receiver")
         servant = ReceiverI(filename, sender, transfer)
         proxy = current.adapter.addWithUUID(servant)
@@ -179,9 +176,10 @@ class TransferEventI(TrawlNet.TransferEvent):
         self.transfer = transfer
         self.broker = broker
 
-    def transferFinished(self, transfer, current=None):
-        print('Se lanza evento finalizar transfer')
+    def transferFinished(self, transfer, current=None):#pylint: disable = W0613
+        print('Se lanza evento finalizacion transfer ' + str(transfer))
         transfer.destroy()
+        print('Cerrando programa ....')
         self.broker.shutdown()
 
 
