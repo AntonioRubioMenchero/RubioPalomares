@@ -6,39 +6,22 @@
 [Repositorio aquí](https://github.com/4Paloms/RubioPalomares.git)
 
 # Ejecucion del programa
-A la hora de ejecutarlo tendremos varias alternativas:
-1. Ejecucion Manual
-2. Ejecucion mediante Make
-3. Ejecucion mediante scripts sh.
 
-## Ejecucion Registry
-
-## Ejecucion IceStorm
-
-
-## Ejecucion SenderFactory
+## Ejecucion Servidora
+Para arrancar toda la parte del servidor utilizaremos el script 
 
 ``
-python3 senders_factory.py --Ice.Config=senders.config
+./run_server.sh
 ``
-Nos imprimira en la terminal un proxy al que nos referiremos como senderfactory
+Una vez iniciada la parte servidora podremos realizar las descargas de los archivos.
 
-## Ejecucion Transfer_manager
+## Ejecucion Cliente
+Para ejecutar el cliente:
 
 ``
-python3 transfer_manager.py --Ice.Config=transfers.config 
+./run_client.sh archivo1 archivo2
 ``
-senderfactory seria una cadena de texto por lo tanto iria 'senderfactory'
-
-Nos imprimira por terminal el proxy del transferfactory que usaremos en el cliente
-
-## Ejecucion File_downloader
-``
-python3 file_downloader.py --Ice.Config=client.config archivo
-``
-transferfactory  sera el proxy que hemos obtenido por la terminal donde hemos ejecutado el transfer_manager
-
-archivo sera el nombre del archivo que querramos probar a poder ser que se encuentre en el directorio ./files/ asi se apreciara de mejor manera el funcionamiento.
+En este caso archivo1 y archivo2 representas los nombres de los archivos para descargar.
 
 
 
