@@ -52,3 +52,4 @@ El sistema estará compuesto por un cliente llamado FileDownloader con una facto
 
 ## Anotaciones
 1. Debido a que ICE realiza una 'carga en el aire', todas las llamadas sobre la interface de ICE generan un error a la hora de ejecutar pylint , por lo tanto, hemos optado por aplicar las lineas de código de desactivación debido a que no aclararia el codigo.
+1. Queremos agradecer a nuestro profesor [Tobias Diaz Diaz-Chiron](https://github.com/ptobiasdiaz) el monitoreo y control del desarrollo de la practica.
